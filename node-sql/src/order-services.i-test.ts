@@ -12,9 +12,13 @@ describe("#getAllOrders", () => {
 it("returns the avg amount per weekly day", async () => {
   const weeklyList = await getAvgOrderAmountByDay();
 
-  expect(weeklyList).to.eql([
-    { averageOrderAmount: 1625, dayOfWeek: 0 },
-    { averageOrderAmount: 941, dayOfWeek: 5 },
-    { averageOrderAmount: 5489, dayOfWeek: 4 },
-  ]);
+  expect(weeklyList).to.eql({
+    sunday: 1625,
+    monday: 0,
+    tuesday: 0,
+    wednesday: 0,
+    thursday: 5489,
+    friday: 941,
+    saturday: 0,
+  });
 });

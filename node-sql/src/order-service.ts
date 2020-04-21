@@ -1,21 +1,33 @@
 import { pool } from "./database-service";
+import { Order, AverageOrderSizeByDayOfWeekStats } from "./models";
 
-export async function getAllOrders() {
+export async function getAllOrders(): Promise<Order[]> {
   const results = await pool.query('SELECT * FROM "order"');
-  return results.rows;
+  return results.rows as Order[];
 }
 
-export async function getAvgOrderAmountByDay() {
-  // ROUND(AVG(amount_cents))
+function getAverageOrderAmountForDayOfWeekFromRows(
+  dayOfWeek: number,
+  rows: any[]
+) {
+  const row = rows.find((x) => x.dayOfWeek === dayOfWeek);
+  return row ? (row.averageOrderAmount as number) : 0;
+}
+
+export async function getAvgOrderAmountByDay(): Promise<
+  AverageOrderSizeByDayOfWeekStats
+> {
   const results = await pool.query(`
   SELECT CAST(ROUND(AVG(amount_cents)) AS INT) AS "averageOrderAmount", DATE_PART('dow', created_at) AS "dayOfWeek" FROM "order"
   GROUP BY DATE_PART('dow', created_at)`);
-  console.log(results.rows);
-  return results.rows;
-  // const dayofWeek = results.rows
 
-  // 0 => sunday
-  // 1 => monday
-  // 4 => thursday
-  // 5 => friday
+  return {
+    sunday: getAverageOrderAmountForDayOfWeekFromRows(0, results.rows),
+    monday: getAverageOrderAmountForDayOfWeekFromRows(1, results.rows),
+    tuesday: getAverageOrderAmountForDayOfWeekFromRows(2, results.rows),
+    wednesday: getAverageOrderAmountForDayOfWeekFromRows(3, results.rows),
+    thursday: getAverageOrderAmountForDayOfWeekFromRows(4, results.rows),
+    friday: getAverageOrderAmountForDayOfWeekFromRows(5, results.rows),
+    saturday: getAverageOrderAmountForDayOfWeekFromRows(6, results.rows),
+  };
 }
