@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { getAllOrders, getAvgOrderAmountByDay } from "./order-service";
 import { pool } from "./database-service";
 
-describe("order-services", () => {
+describe("order-service", () => {
   before(async () => {
     await pool.query(`
       INSERT INTO "order"
@@ -22,8 +22,15 @@ describe("order-services", () => {
 
   describe("#getAllOrders", () => {
     it("returns a list of all orders", async () => {
-      const orderList = await getAllOrders();
-      expect(orderList).to.have.lengthOf(4);
+      const orders = await getAllOrders();
+      expect(orders).to.have.lengthOf(4);
+      const order = orders.find((x) => x.id === "id-1");
+      expect(order.id).to.equal("id-1");
+      expect(order.amountCents).to.equal(1256);
+      expect(order.createdAt).to.be.instanceOf(Date);
+      expect(order.createdAt.toISOString).to.eql(
+        new Date("2020-04-10").toISOString
+      );
     });
   });
 

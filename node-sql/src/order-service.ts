@@ -1,9 +1,10 @@
 import { pool } from "./database-service";
 import { Order, AverageOrderSizeByDayOfWeekStats } from "./models";
+import { dbRowToOrderModel } from "./transforms";
 
 export async function getAllOrders(): Promise<Order[]> {
   const results = await pool.query('SELECT * FROM "order"');
-  return results.rows as Order[];
+  return results.rows.map(dbRowToOrderModel);
 }
 
 function getAverageOrderAmountForDayOfWeekFromRows(

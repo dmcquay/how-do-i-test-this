@@ -25,6 +25,10 @@ Running other stuff in Docker? Easy way to stop it: `docker ps -q | xargs docker
   - Would you test the types coming back from an API?
   - Why would you trust your database schema less?
 - What if we introduce types? Do we need any tests at all?
+- Acceptance tests
+  - Should your acceptance tests use something like supertest or hit the actual API via HTTP?
+  - Should you write your tests so that they can be executed against an uncontrolled environment like staging?
+- Should you use actual services from other teams in your dev env and tests? Or mock them so you can fully control?
 
 # Types of Tests
 
@@ -39,3 +43,7 @@ I think the definition by Steve Freeman is most consistent with what we do at Pl
 You'll see other definitions. Common ones I've seen:
 E2E usually written by a QA team. Automated.
 Acceptance (usually UAT - User Acceptance Testing) is usually manual, by some business user checking that requirements are met
+
+# Ideas
+
+- Forgot to map underscore column names to camel case model fields. Where should that be tested?

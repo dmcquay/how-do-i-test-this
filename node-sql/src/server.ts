@@ -7,13 +7,11 @@ const app = express();
 
 app.get("/orders", async (req: Request, res: Response) => {
   const orders = await getAllOrders();
-  res.set("Content-type", "application/json");
   res.send(orders);
 });
 
 app.get("/order-stats", async (req: Request, res: Response) => {
   const stats = await getAvgOrderAmountByDay();
-  res.set("Content-type", "application/json");
   res.send(stats);
 });
 
