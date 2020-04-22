@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*test.ts",
+    "test:integration": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
+    "test:integration-separate-db": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
     "setup-environment": "./dev-scripts/setup-environment.sh",
     "psql": "./dev-scripts/psql.sh",
     "start": "ts-node-dev src/server.ts"
