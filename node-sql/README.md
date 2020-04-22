@@ -32,6 +32,7 @@ Running other stuff in Docker? Easy way to stop it: `docker ps -q | xargs docker
 
 # Types of Tests
 
+https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing
 https://stackoverflow.com/questions/30245767/are-user-acceptance-test-uat-and-end-to-end-e2e-test-the-same-thing
 
 I think the definition by Steve Freeman is most consistent with what we do at Pluralsight.

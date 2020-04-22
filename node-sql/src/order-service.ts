@@ -36,3 +36,11 @@ export async function getAvgOrderAmountByDay(): Promise<
     saturday: getAverageOrderAmountForDayOfWeekFromRows(6, results.rows),
   };
 }
+
+export async function create(order: Order): Promise<null> {
+  return Promise.resolve(null);
+}
+
+export async function getOrderById(id: string): Promise<Order> {
+  return {} as Order;
+}

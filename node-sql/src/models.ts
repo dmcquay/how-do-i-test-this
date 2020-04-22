@@ -1,3 +1,7 @@
+export interface CreateOrderRequest {
+  amountCents: number;
+}
+
 export interface Order {
   id: string;
   amountCents: number;

@@ -1,8 +1,44 @@
 import fetch, { Response } from "node-fetch";
 import { expect } from "chai";
-import { Order } from "./models";
+import { assertISODate } from "@elunic/is-iso-date";
+
+import { Order, CreateOrderRequest } from "./models";
 
 describe("orders acceptance tests", () => {
+  describe("CRUD", () => {
+    let orderUri: string;
+
+    it("should response succefully to a well-formed order create request", async () => {
+      const createOrderRequest: CreateOrderRequest = {
+        amountCents: 489,
+      };
+
+      const createResult = await fetch("http://localhost:3000/orders", {
+        method: "POST",
+        body: JSON.stringify(createOrderRequest),
+        redirect: "manual",
+      });
+
+      expect(createResult.status).to.equal(303);
+      expect(createResult.headers.get("location")).to.match(/\/orders\/.+/);
+
+      orderUri = createResult.headers.get("location");
+    });
+
+    it("should be able to subsequently fetch the created order", async () => {
+      const response = await fetch(orderUri);
+      const orderId = orderUri.split("/").reverse()[0];
+
+      expect(response.status).to.equal(200);
+
+      const data = await response.json();
+
+      expect(data.amountCents).to.equal(489);
+      expect(data.id).to.equal(orderId);
+      assertISODate(data.createdAt);
+    });
+  });
+
   describe("GET /orders", () => {
     let response: Response;
     let data: any;
