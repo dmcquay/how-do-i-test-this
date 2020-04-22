@@ -18,8 +18,12 @@ export async function getAvgOrderAmountByDay(): Promise<
   AverageOrderSizeByDayOfWeekStats
 > {
   const results = await pool.query(`
-  SELECT CAST(ROUND(AVG(amount_cents)) AS INT) AS "averageOrderAmount", DATE_PART('dow', created_at) AS "dayOfWeek" FROM "order"
-  GROUP BY DATE_PART('dow', created_at)`);
+    SELECT
+      CAST(ROUND(AVG(amount_cents)) AS INT) AS "averageOrderAmount",
+      DATE_PART('dow', created_at) AS "dayOfWeek"
+    FROM "order"
+    GROUP BY DATE_PART('dow', created_at)
+  `);
 
   return {
     sunday: getAverageOrderAmountForDayOfWeekFromRows(0, results.rows),
