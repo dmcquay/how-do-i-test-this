@@ -4,9 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "test:unit": "mocha --watch-extensions ts --require ts-node/register src/**/*.test.ts",
+    "test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts",
     "test:acceptance": "mocha --require ts-node/register src/**/*.a-test.ts",
-    "test:integration": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
-    "test:integration-separate-db": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
+    "test:integration:shared-db": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
+    "test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
     "setup-environment": "./dev-scripts/setup-environment.sh",
     "psql": "./dev-scripts/psql.sh",
     "start": "ts-node-dev src/server.ts"
@@ -16,6 +18,7 @@
     "express": "^4.17.1",
     "mocha": "^7.1.1",
     "pg": "^8.0.2",
+    "ramda": "^0.27.0",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
@@ -25,6 +28,7 @@
     "@types/mocha": "^7.0.2",
     "@types/node-fetch": "^2.5.6",
     "@types/pg": "^7.14.3",
+    "@types/ramda": "^0.27.3",
     "@types/uuid": "^7.0.2",
     "node-fetch": "^2.6.0",
     "ts-node": "^8.9.0",

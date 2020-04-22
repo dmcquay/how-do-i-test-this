@@ -1,26 +1,54 @@
 import { expect } from "chai";
+import * as uuid from "uuid";
 
-import { getAllOrders, getAvgOrderAmountByDay } from "./order-service";
+import {
+  getAllOrders,
+  getAvgOrderAmountByDay,
+  createOrder,
+  getOrderById,
+} from "./order-service";
 import { pool } from "./database-service";
+import { Order } from "./models";
 
 describe("order-service", () => {
-  before(async () => {
-    await pool.query(`
-      INSERT INTO "order"
-      (id, amount_cents, created_at)
-      VALUES
-      ('id-1', 1256, '2020-04-10'),
-      ('id-2', 5489, '2020-04-02'),
-      ('id-3', 625, '2020-04-03'),
-      ('id-3', 1625, '2020-04-05')
-    `);
-  });
+  describe("CRUD", () => {
+    after(async () => {
+      await pool.query('DELETE FROM "order"');
+    });
 
-  after(async () => {
-    await pool.query('DELETE FROM "order"');
+    const order: Order = {
+      id: uuid.v4(),
+      createdAt: new Date(),
+      amountCents: 1234,
+    };
+
+    it("should create order", async () => {
+      await createOrder(order);
+    });
+
+    it("should be able to read the order created", async () => {
+      const orderFromDb = await getOrderById(order.id);
+      expect(orderFromDb).to.eql(order);
+    });
   });
 
   describe("#getAllOrders", () => {
+    before(async () => {
+      await pool.query(`
+        INSERT INTO "order"
+        (id, amount_cents, created_at)
+        VALUES
+        ('id-1', 1256, '2020-04-10'),
+        ('id-2', 5489, '2020-04-02'),
+        ('id-3', 625, '2020-04-03'),
+        ('id-3', 1625, '2020-04-05')
+      `);
+    });
+
+    after(async () => {
+      await pool.query('DELETE FROM "order"');
+    });
+
     it("returns a list of all orders", async () => {
       const orders = await getAllOrders();
       expect(orders).to.have.lengthOf(4);
@@ -35,6 +63,22 @@ describe("order-service", () => {
   });
 
   describe("#getAvgOrderAmountByDay", () => {
+    before(async () => {
+      await pool.query(`
+        INSERT INTO "order"
+        (id, amount_cents, created_at)
+        VALUES
+        ('id-1', 1256, '2020-04-10'),
+        ('id-2', 5489, '2020-04-02'),
+        ('id-3', 625, '2020-04-03'),
+        ('id-3', 1625, '2020-04-05')
+      `);
+    });
+
+    after(async () => {
+      await pool.query('DELETE FROM "order"');
+    });
+
     it("returns the avg amount per weekly day", async () => {
       const weeklyList = await getAvgOrderAmountByDay();
 

@@ -15,6 +15,9 @@ describe("orders acceptance tests", () => {
 
       const createResult = await fetch("http://localhost:3000/orders", {
         method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
         body: JSON.stringify(createOrderRequest),
         redirect: "manual",
       });
@@ -36,6 +39,23 @@ describe("orders acceptance tests", () => {
       expect(data.amountCents).to.equal(489);
       expect(data.id).to.equal(orderId);
       assertISODate(data.createdAt);
+    });
+  });
+
+  describe("POST /orders", () => {
+    context("when body is malformed", () => {
+      it("should return a 400", async () => {
+        const createResult = await fetch("http://localhost:3000/orders", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: '{"foo": "bar"}',
+          redirect: "manual",
+        });
+
+        expect(createResult.status).to.equal(400);
+      });
     });
   });
 

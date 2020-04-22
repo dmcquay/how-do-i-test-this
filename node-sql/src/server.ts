@@ -1,10 +1,17 @@
 import express, { Request, Response } from "express";
 
-import { Order } from "./models";
-import { getAllOrders, getAvgOrderAmountByDay } from "./order-service";
+import {
+  getAllOrders,
+  getAvgOrderAmountByDay,
+  createOrder,
+  getOrderById,
+} from "./order-service";
+import { createOrderRequestToOrderModel } from "./transforms";
+import { isValidCreateOrderRequest } from "./validation";
 import { pool } from "./database-service";
 
 const app = express();
+app.use(express.json());
 
 app.get("/orders", async (req: Request, res: Response) => {
   const orders = await getAllOrders();
@@ -12,17 +19,21 @@ app.get("/orders", async (req: Request, res: Response) => {
 });
 
 app.get("/orders/:orderId", async (req: Request, res: Response) => {
-  const order: Order = {
-    id: req.params.orderId,
-    createdAt: new Date(),
-    amountCents: 489,
-  };
+  const order = await getOrderById(req.params.orderId);
   res.send(order);
 });
 
 app.post("/orders", async (req: Request, res: Response) => {
+  if (!isValidCreateOrderRequest(req.body)) {
+    res.status(400);
+    res.send("Invalid create order request");
+    return;
+  }
+
+  const order = createOrderRequestToOrderModel(req.body);
+  await createOrder(order);
   res.status(303);
-  res.set("location", "/orders/123");
+  res.set("location", `/orders/${order.id}`);
   res.end();
 });
 
@@ -31,9 +42,10 @@ app.get("/order-stats", async (req: Request, res: Response) => {
   res.send(stats);
 });
 
-function gracefulShutdown(err: Error) {
+async function gracefulShutdown(err: Error) {
   console.error(err);
-  pool.end();
+  await pool.end();
+  process.exit(1);
 }
 
 process.on("uncaughtException", gracefulShutdown);

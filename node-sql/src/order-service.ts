@@ -37,10 +37,21 @@ export async function getAvgOrderAmountByDay(): Promise<
   };
 }
 
-export async function create(order: Order): Promise<null> {
-  return Promise.resolve(null);
+export async function createOrder(order: Order): Promise<void> {
+  await pool.query(
+    `
+    INSERT INTO "order"
+    (id, created_at, amount_cents)
+    VALUES
+    ($1, $2, $3)
+  `,
+    [order.id, order.createdAt, order.amountCents]
+  );
 }
 
-export async function getOrderById(id: string): Promise<Order> {
-  return {} as Order;
+export async function getOrderById(orderId: string): Promise<Order> {
+  const result = await pool.query(`SELECT * FROM "order" WHERE id = $1`, [
+    orderId,
+  ]);
+  return dbRowToOrderModel(result.rows[0]);
 }
