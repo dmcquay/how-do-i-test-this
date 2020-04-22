@@ -1,16 +1,15 @@
 {
-  "name": "2020-04-09-testing-sql",
+  "name": "example-api",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test:unit": "mocha --watch-extensions ts --require ts-node/register src/**/*.test.ts",
+    "test": "npm run test:unit && npm run test:integration && npm run test:acceptance",
+    "test:unit": "mocha --require ts-node/register src/**/*.test.ts",
     "test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts",
     "test:acceptance": "mocha --require ts-node/register src/**/*.a-test.ts",
     "test:integration:shared-db": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
     "test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
-    "setup-environment": "./dev-scripts/setup-environment.sh",
-    "psql": "./dev-scripts/psql.sh",
     "start": "ts-node-dev src/server.ts"
   },
   "dependencies": {
