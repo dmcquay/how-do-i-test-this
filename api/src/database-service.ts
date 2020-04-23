@@ -1,11 +1,5 @@
 import { Pool } from "pg";
 
-const e = process.env;
+import config from "./config";
 
-export const pool = new Pool({
-  user: "app",
-  host: "localhost",
-  database: "test",
-  password: "password",
-  port: parseInt(e.POSTGRES_PORT) || 5432,
-});
+export const pool = new Pool(config.postgres);

@@ -6,6 +6,7 @@ export interface Order {
   id: string;
   amountCents: number;
   createdAt: Date;
+  riskScore: number;
 }
 
 export interface AverageOrderSizeByDayOfWeekStats {

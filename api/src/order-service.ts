@@ -41,11 +41,11 @@ export async function createOrder(order: Order): Promise<void> {
   await pool.query(
     `
     INSERT INTO "order"
-    (id, created_at, amount_cents)
+    (id, created_at, amount_cents, risk_score)
     VALUES
-    ($1, $2, $3)
+    ($1, $2, $3, $4)
   `,
-    [order.id, order.createdAt, order.amountCents]
+    [order.id, order.createdAt, order.amountCents, order.riskScore]
   );
 }
 

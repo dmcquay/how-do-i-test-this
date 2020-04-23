@@ -8,8 +8,8 @@
     "test:unit": "mocha --require ts-node/register src/**/*.test.ts",
     "test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts",
     "test:acceptance": "mocha --require ts-node/register src/**/*.a-test.ts",
-    "test:integration:shared-db": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
-    "test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
+    "test:integration:shared-db": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
+    "test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
     "start": "ts-node-dev src/server.ts"
   },
   "dependencies": {

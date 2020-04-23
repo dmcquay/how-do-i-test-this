@@ -9,6 +9,8 @@ import {
 import { createOrderRequestToOrderModel } from "./transforms";
 import { isValidCreateOrderRequest } from "./validation";
 import { pool } from "./database-service";
+import { getOrderRiskScore } from "./risk-service";
+import { CreateOrderRequest } from "./models";
 
 const app = express();
 app.use(express.json());
@@ -29,8 +31,11 @@ app.post("/orders", async (req: Request, res: Response) => {
     res.send("Invalid create order request");
     return;
   }
+  const createOrderRequest = req.body as CreateOrderRequest;
 
-  const order = createOrderRequestToOrderModel(req.body);
+  const riskScore = await getOrderRiskScore(createOrderRequest);
+
+  const order = createOrderRequestToOrderModel(createOrderRequest, riskScore);
   await createOrder(order);
   res.status(303);
   res.set("location", `/orders/${order.id}`);

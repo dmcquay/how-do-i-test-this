@@ -39,6 +39,7 @@ describe("orders acceptance tests", () => {
       expect(data.amountCents).to.equal(489);
       expect(data.id).to.equal(orderId);
       assertISODate(data.createdAt);
+      expect(typeof data.riskScore).to.equal("number");
     });
   });
 
