@@ -11,9 +11,12 @@ This is an example web application. It has a couple endpoints that run SQL queri
 
 Running other stuff in Docker? Easy way to stop it: `docker ps -q | xargs docker stop`
 
-- Setup Environment: `npm run setup-environment`
-- Run API: `npm start`
-- Run Tests: `npm test`
+Run all of the following from `dev-scripts`
+
+- Setup Environment: `setup-environment.sh`
+- Start Everything: `start.sh`
+- Run API Tests: `cd api && npm test`
+- View all orders: Open http://localhost:3000/orders in a browser.
 
 # Decisions
 
