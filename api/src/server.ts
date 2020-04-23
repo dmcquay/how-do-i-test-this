@@ -11,6 +11,7 @@ import { isValidCreateOrderRequest } from "./validation";
 import { pool } from "./database-service";
 import { getOrderRiskScore } from "./risk-service";
 import { CreateOrderRequest } from "./models";
+import config from "./config";
 
 const app = express();
 app.use(express.json());
@@ -56,6 +57,6 @@ async function gracefulShutdown(err: Error) {
 process.on("uncaughtException", gracefulShutdown);
 process.on("unhandledRejection", gracefulShutdown);
 
-app.listen(3000, () => {
-  console.log("Listening on http://localhost:3000/");
+app.listen(config.port, () => {
+  console.log(`API Started. Listening on port ${config.port}.`);
 });

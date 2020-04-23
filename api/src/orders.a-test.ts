@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { assertISODate } from "@elunic/is-iso-date";
 
 import { Order, CreateOrderRequest } from "./models";
+import config from "./config";
 
 describe("orders acceptance tests", () => {
   describe("CRUD", () => {
@@ -13,7 +14,7 @@ describe("orders acceptance tests", () => {
         amountCents: 489,
       };
 
-      const createResult = await fetch("http://localhost:3000/orders", {
+      const createResult = await fetch(`${config.test.baseUrl}/orders`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -46,7 +47,7 @@ describe("orders acceptance tests", () => {
   describe("POST /orders", () => {
     context("when body is malformed", () => {
       it("should return a 400", async () => {
-        const createResult = await fetch("http://localhost:3000/orders", {
+        const createResult = await fetch(`${config.test.baseUrl}/orders`, {
           method: "POST",
           headers: {
             "content-type": "application/json",
@@ -65,7 +66,7 @@ describe("orders acceptance tests", () => {
     let data: any;
 
     before(async () => {
-      response = await fetch("http://localhost:3000/orders");
+      response = await fetch(`${config.test.baseUrl}/orders`);
       data = await response.text();
     });
 
@@ -95,7 +96,7 @@ describe("orders acceptance tests", () => {
     let data: any;
 
     before(async () => {
-      response = await fetch("http://localhost:3000/order-stats");
+      response = await fetch(`${config.test.baseUrl}/order-stats`);
       data = await response.text();
     });
 
