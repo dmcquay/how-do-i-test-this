@@ -10,5 +10,6 @@ PROJECT_ROOT=`dirname $SCRIPT_ROOT`
     npx concurrently \
         "npm install" \
         "npm -C api install" \
+        "npm -C mocks install" \
         "./dev-scripts/destroy-environment.sh && docker-compose up -d"
 )
