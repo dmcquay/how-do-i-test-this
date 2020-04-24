@@ -8,7 +8,6 @@
     "test:unit": "mocha --require ts-node/register src/**/*.test.ts",
     "test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts",
     "test:acceptance": "mocha --require ts-node/register src/**/*.a-test.ts",
-    "test:integration:shared-db": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test2.ts",
     "test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
     "start": "ts-node-dev src/server.ts"
   },
@@ -29,6 +28,7 @@
     "@types/pg": "^7.14.3",
     "@types/ramda": "^0.27.3",
     "@types/uuid": "^7.0.2",
+    "class-validator": "^0.12.2",
     "node-fetch": "^2.6.0",
     "ts-node": "^8.9.0",
     "ts-node-dev": "^1.0.0-pre.44",

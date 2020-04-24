@@ -2,14 +2,14 @@ export interface CreateOrderRequest {
   amountCents: number;
 }
 
-export interface Order {
+export interface OrderModel {
   id: string;
   amountCents: number;
   createdAt: Date;
   riskScore: number;
 }
 
-export interface AverageOrderSizeByDayOfWeekStats {
+export interface AverageOrderSizeByDayOfWeekStatsModel {
   sunday: number;
   monday: number;
   tuesday: number;
@@ -17,4 +17,9 @@ export interface AverageOrderSizeByDayOfWeekStats {
   thursday: number;
   friday: number;
   saturday: number;
+}
+
+export interface AverageOrderSizeByDayOfWeekStatsRecord {
+  averageOrderAmount: number;
+  dayOfWeek: number;
 }

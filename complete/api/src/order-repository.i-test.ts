@@ -6,17 +6,17 @@ import {
   getAvgOrderAmountByDay,
   createOrder,
   getOrderById,
-} from "./order-service";
+} from "./order-repository";
 import { pool } from "./database-service";
-import { Order } from "./models";
+import { OrderModel, AverageOrderSizeByDayOfWeekStatsRecord } from "./models";
 
-describe("order-service", () => {
+describe("order-repository", () => {
   describe("CRUD", () => {
     after(async () => {
       await pool.query('DELETE FROM "order"');
     });
 
-    const order: Order = {
+    const order: OrderModel = {
       id: uuid.v4(),
       createdAt: new Date(),
       amountCents: 1234,
@@ -82,17 +82,15 @@ describe("order-service", () => {
     });
 
     it("returns the avg amount per weekly day", async () => {
-      const weeklyList = await getAvgOrderAmountByDay();
+      const expectedRecords: AverageOrderSizeByDayOfWeekStatsRecord[] = [
+        { dayOfWeek: 0, averageOrderAmount: 1625 },
+        { dayOfWeek: 4, averageOrderAmount: 5489 },
+        { dayOfWeek: 5, averageOrderAmount: 941 },
+      ];
 
-      expect(weeklyList).to.eql({
-        sunday: 1625,
-        monday: 0,
-        tuesday: 0,
-        wednesday: 0,
-        thursday: 5489,
-        friday: 941,
-        saturday: 0,
-      });
+      const actualRecords = await getAvgOrderAmountByDay();
+
+      expect(actualRecords).to.eql(expectedRecords);
     });
   });
 });

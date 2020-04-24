@@ -1,11 +1,7 @@
 import express, { Request, Response } from "express";
 
-import {
-  getAllOrders,
-  getAvgOrderAmountByDay,
-  createOrder,
-  getOrderById,
-} from "./order-service";
+import { getAllOrders, createOrder, getOrderById } from "./order-repository";
+import { getAvgOrderAmountByDay } from "./order-service";
 import { createOrderRequestToOrderModel } from "./transforms";
 import { isValidCreateOrderRequest } from "./validation";
 import { pool } from "./database-service";

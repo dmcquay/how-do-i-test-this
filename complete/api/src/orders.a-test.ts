@@ -2,7 +2,7 @@ import fetch, { Response } from "node-fetch";
 import { expect } from "chai";
 import { assertISODate } from "@elunic/is-iso-date";
 
-import { Order, CreateOrderRequest } from "./models";
+import { OrderModel, CreateOrderRequest } from "./models";
 import config from "./config";
 
 describe("orders acceptance tests", () => {
@@ -84,7 +84,7 @@ describe("orders acceptance tests", () => {
     it("should return a list of orders", async () => {
       const orders = JSON.parse(data);
       expect(orders).to.be.instanceOf(Array);
-      const firstOrder = orders[0] as Order;
+      const firstOrder = orders[0] as OrderModel;
       expect(typeof firstOrder.amountCents).to.equal("number");
       expect(typeof firstOrder.createdAt).to.equal("string");
       expect(typeof firstOrder.id).to.equal("string");
