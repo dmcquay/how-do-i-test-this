@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 
 import { getAllOrders, createOrder, getOrderById } from "./order-repository";
-import { getAvgOrderAmountByDay } from "./order-service";
 import { createOrderRequestToOrderModel } from "./transforms";
 import { isValidCreateOrderRequest } from "./validation";
 import { pool } from "./database-service";
@@ -37,11 +36,6 @@ app.post("/orders", async (req: Request, res: Response) => {
   res.status(303);
   res.set("location", `/orders/${order.id}`);
   res.end();
-});
-
-app.get("/order-stats", async (req: Request, res: Response) => {
-  const stats = await getAvgOrderAmountByDay();
-  res.send(stats);
 });
 
 async function gracefulShutdown(err: Error) {

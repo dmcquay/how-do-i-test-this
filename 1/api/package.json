@@ -4,11 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "npm run test:unit && npm run test:integration && npm run test:acceptance",
-    "test:unit": "mocha --require ts-node/register src/**/*.test.ts",
-    "test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts",
-    "test:acceptance": "mocha --require ts-node/register src/**/*.a-test.ts",
-    "test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts",
     "start": "ts-node-dev src/server.ts"
   },
   "dependencies": {
