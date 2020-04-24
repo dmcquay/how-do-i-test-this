@@ -1,5 +1,5 @@
 {
-  "name": "how-do-i-test-this",
+  "name": "how-should-i-test-this",
   "version": "1.0.0",
   "description": "This is an example web application. It has a couple endpoints that run SQL queries of varying complexity. The purpose is explore various methods of testing such endpoints.",
   "main": "index.js",
