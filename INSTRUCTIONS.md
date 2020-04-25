@@ -317,3 +317,157 @@ Run your tests again: `npm run test:integration`
 
 They are passing again, only this time you can trust that they will continue to pass
 in the future.
+
+## Step 5: Transform the result
+
+The data is coming out of the database as a list of
+`AverageOrderSizeByDayOfWeekStatsRecord`s. But remember from the requirements that
+we need it to look like this:
+
+```json
+{
+  "sunday": 1056,
+  "monday": 1511,
+  "tuesday": 1223,
+  "wednesday": 1342,
+  "thursday": 1497,
+  "friday": 2711,
+  "saturday": 1645
+}
+```
+
+Let's create a model for that. Let's define that interface in `models.ts`.
+
+```typescript
+export interface AverageOrderSizeByDayOfWeekStatsModel {
+  sunday: number;
+  monday: number;
+  tuesday: number;
+  wednesday: number;
+  thursday: number;
+  friday: number;
+  saturday: number;
+}
+```
+
+And now we need to transform a list of `AverageOrderSizeByDayOfWeekStatsRecord`s to a single
+`AverageOrderSizeByDayOfWeekStatsModel`. You might be tempted to do this in
+`order-repository.ts`, but don't!
+
+- This is a separate concern (or responsibility) from interacting with the database. SRP
+  (single responsibility principle) states that we shouldn't mix these two concerns in a
+  single function.
+- The test pyramid tells us to favor the bottom of the pyramid. This can easily be tested
+  with a unit test. If we add this code to our repository layer, it must be tested with integration tests.
+
+So let's implement this in the aptly named `transforms.ts` file.
+
+But, of course, let's start with a test first.
+
+`transforms.test.ts`
+
+```typescript
+import { expect } from "chai";
+
+import { AverageOrderSizeByDayOfWeekStatsRecord } from "./models";
+
+import { averageOrderSizeByDayOfWeekRecordsToModel } from "./transforms";
+
+describe("transforms", () => {
+  describe("#averageOrderSizeByDayOfWeekRecordsToModel", () => {
+    context("when out of order and missing some data", () => {
+      it("should map all values correctly and default to 0", () => {});
+      const records: AverageOrderSizeByDayOfWeekStatsRecord[] = [
+        {
+          dayOfWeek: 0,
+          averageOrderAmount: 10,
+        },
+        {
+          dayOfWeek: 1,
+          averageOrderAmount: 11,
+        },
+        {
+          dayOfWeek: 3,
+          averageOrderAmount: 13,
+        },
+        {
+          dayOfWeek: 2,
+          averageOrderAmount: 12,
+        },
+        {
+          dayOfWeek: 4,
+          averageOrderAmount: 14,
+        },
+        {
+          dayOfWeek: 6,
+          averageOrderAmount: 16,
+        },
+      ];
+
+      const expectedModel = {
+        sunday: 10,
+        monday: 11,
+        tuesday: 12,
+        wednesday: 13,
+        thursday: 14,
+        friday: 0,
+        saturday: 16,
+      };
+
+      const actualModel = averageOrderSizeByDayOfWeekRecordsToModel(records);
+
+      expect(actualModel).to.eql(expectedModel);
+    });
+  });
+});
+```
+
+This is our first unit test. We need to set up a script in `package.json` to run unit
+tests.
+
+`"test:unit": "mocha --require ts-node/register src/**/*.test.ts"`
+
+Let's also add a line to make it easy to run these in watch mode, which is a little
+more tricky since we're using TypeScript.
+
+`"test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts"`
+
+And, while we're at it, let's create a shortcut to run all the tests.
+
+`"test": "npm run test:unit && npm run test:integration && npm run test:acceptance"`
+
+Let's run our unit test: `npm run test:unit`
+
+They should fail, complaining that we haven't exported the
+`averageOrderSizeByDayOfWeekRecordsToModel` function yet. Let's go define that function
+in `transforms.ts`.
+
+```typescript
+function getAverageOrderAmountForDayOfWeekFromRows(
+  dayOfWeek: number,
+  rows: any[]
+) {
+  const row = rows.find((x) => x.dayOfWeek === dayOfWeek);
+  return row ? (row.averageOrderAmount as number) : 0;
+}
+
+export function averageOrderSizeByDayOfWeekRecordsToModel(
+  records: AverageOrderSizeByDayOfWeekStatsRecord[]
+): AverageOrderSizeByDayOfWeekStatsModel {
+  return {
+    sunday: getAverageOrderAmountForDayOfWeekFromRows(0, records),
+    monday: getAverageOrderAmountForDayOfWeekFromRows(1, records),
+    tuesday: getAverageOrderAmountForDayOfWeekFromRows(2, records),
+    wednesday: getAverageOrderAmountForDayOfWeekFromRows(3, records),
+    thursday: getAverageOrderAmountForDayOfWeekFromRows(4, records),
+    friday: getAverageOrderAmountForDayOfWeekFromRows(5, records),
+    saturday: getAverageOrderAmountForDayOfWeekFromRows(6, records),
+  };
+}
+```
+
+You'll have to import `AverageOrderSizeByDayOfWeekStatsRecord` and
+`AverageOrderSizeByDayOfWeekStatsModel` from `models.ts`.
+
+Run the unit test again: `npm run test:unit`
+They should be passing now.
