@@ -510,3 +510,13 @@ import { getAvgOrderAmountByDay } from "./order-service";
 ```
 
 Check that our tests are still passing: `npm run test:acceptance`
+
+## Step 7: Review and debate!
+
+- We didn't write any tests for `order-service.ts`. Should we have?
+- We didn't handle any error cases. What important error cases do you think we missed?
+- Take a look at a more simple repository function like `getOrderById`. Does it warrant
+  an integration test? And how do you feel about that `SELECT *`? Should we be
+  specifying columns?
+- Take a look back at our overall testing values/goals and the testing pyramid. How
+  well do you think we achieved those goals? Would you have approached this differently?
