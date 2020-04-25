@@ -1,3 +1,10 @@
+## Prepare for the exercise
+
+- Clone the repo at git@github.com:dmcquay/how-should-i-test-this.git
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- If you're on Windows, you'll need the Linux Subsystem, Git Bash or some other
+  means of getting access to Bash.
+
 ## Testing goals
 
 [Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
