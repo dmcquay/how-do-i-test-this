@@ -10,5 +10,5 @@ Run all of the following from `dev-scripts`
 
 - Setup Environment: `setup-environment.sh`
 - Start Everything: `start.sh`
-- Run API Tests: `cd api && npm test`
+- Run API Tests: `cd api && npm test` (Must be running `start.sh` for acceptance tests to pass.)
 - View all orders: Open http://localhost:3000/orders in a browser.
