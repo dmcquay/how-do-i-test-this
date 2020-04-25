@@ -1,3 +1,11 @@
+## Testing goals
+
+[Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
+
+Today, we're going to focus on these three:
+
+![Testing Pyramid: Unit, Integration, Acceptance](docs/testing-pyramid.jpg)
+
 I have provded an example e-commerce order management API. It only has a few CRUD endpoints so far. Today we are going to be adding a new endpoint with a focus on how to test it. All tests have been removed from the start folder so that you can work through how to setup all the testing from scratch.
 
 ## Step 1: Get the project running
