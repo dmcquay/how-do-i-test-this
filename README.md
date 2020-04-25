@@ -149,9 +149,10 @@ with a test!
   - We could mock the connection to the database
   - But we could then only verify that we pass the SQL that
     we expect to pass. We cannot verify that the SQL is correct.
-- Integration tests
+- **Integration tests**
   - Best solution
-  - Allows you to verify the correctness of SQL
+  - Allows you to verify the correctness of SQL at the lowest layer possible in
+    the testing pyramid
 - Acceptance tests
   - Harder to control data for exact verification of results
   - Mixing with other things being tested at that layer
@@ -189,9 +190,6 @@ Opinion: Why have separate entrypoints for different types of tests?
 
 ### Enable integration tests to work with the database
 
-This exercise is about testing, not SQL. So I'm just going to provide a known
-working query.
-
 Our query is going to return rows that each have a number representing the day of
 week and a number representing the average order amount on that day of the week.
 Let's create an interface to represent this record.
@@ -203,6 +201,33 @@ export interface AverageOrderSizeByDayOfWeekStatsRecord {
   averageOrderAmount: number;
   dayOfWeek: number;
 }
+```
+
+Replace our dummy integration test with a real one.
+
+`order-repository.i-test.ts`
+
+```ts
+import { expect } from "chai";
+
+import { getAvgOrderAmountByDay } from "./order-repository";
+import { AverageOrderSizeByDayOfWeekStatsRecord } from "./models";
+
+describe("order-repository", () => {
+  describe("#getAvgOrderAmountByDay", () => {
+    it("should return the avg amount per weekly day", async () => {
+      const expectedRecords: AverageOrderSizeByDayOfWeekStatsRecord[] = [
+        { dayOfWeek: 0, averageOrderAmount: 1625 },
+        { dayOfWeek: 4, averageOrderAmount: 5489 },
+        { dayOfWeek: 5, averageOrderAmount: 941 },
+      ];
+
+      const actualRecords = await getAvgOrderAmountByDay();
+
+      expect(actualRecords).to.eql(expectedRecords);
+    });
+  });
+});
 ```
 
 And let's just speed along here and add the whole implementation to make this pass.

@@ -12,7 +12,4 @@ export default {
   riskService: {
     baseUrl: e.RISK_SERVICE_BASE_URL || "http://localhost:3001/risk",
   },
-  test: {
-    baseUrl: e.BASE_URL || "http://localhost:3000",
-  },
 };
