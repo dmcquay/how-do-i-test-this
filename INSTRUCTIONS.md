@@ -33,7 +33,7 @@ Create an empty test. We'll be using the mocha framework. It is already installe
 
 `src/order-stats.a-test.ts`
 
-```typescript
+```ts
 it("works", () => {});
 ```
 
@@ -51,7 +51,7 @@ Replace your dummy test with the following
 
 `src/order-stats.a-test.ts`
 
-```typescript
+```ts
 import { expect } from "chai";
 import fetch from "node-fetch";
 import config from "./config";
@@ -69,7 +69,7 @@ describe("GET /order-stats", () => {
 Our test needs to know where to find our API. This way we can run our acceptance tests against remote environments.
 Add the following to `config.ts`:
 
-```typescript
+```ts
 test: {
   baseUrl: e.BASE_URL || "http://localhost:3000",
 },
@@ -90,7 +90,7 @@ Opinion: why I suggest verifying little at this layer:
 
 Edit `server.ts` and add this endpoint.
 
-```typescript
+```ts
 app.get("/order-stats", async (req: Request, res: Response) => {
   const stats = {
     monday: 1,
@@ -133,7 +133,7 @@ So we need an integration test, but we don't have any in our project yet. We're 
 
 Create `order-repository.i-test.ts` with our standard dummy test.
 
-```typescript
+```ts
 it("works", () => {});
 ```
 
@@ -168,7 +168,7 @@ Let's create an interface to represent this record.
 
 Add the following to `models.ts`.
 
-```typescript
+```ts
 export interface AverageOrderSizeByDayOfWeekStatsRecord {
   averageOrderAmount: number;
   dayOfWeek: number;
@@ -179,7 +179,7 @@ And let's just speed along here and add the whole implementation to make this pa
 
 Add this function to `order-repository.ts`.
 
-```typescript
+```ts
 export async function getAvgOrderAmountByDay(): Promise<
   AverageOrderSizeByDayOfWeekStatsRecord[]
 > {
@@ -213,7 +213,7 @@ We need to close that connection immediately upon completion of the test suite.
 
 Create `integration-test-setup.ts` with this content.
 
-```typescript
+```ts
 import { pool } from "./database-service";
 
 after(() => {
@@ -291,7 +291,7 @@ This time they will fail because there is no data in the database.
 Now let's insert the data we need and clean it up when we are done by adding these blocks.
 In `order-repository.i-test.ts`, put these inside the `describe("#getAvgOrderAmountByDay"` block.
 
-```typescript
+```ts
 before(async () => {
   await pool.query(`
     INSERT INTO "order"
@@ -338,7 +338,7 @@ we need it to look like this:
 
 Let's create a model for that. Let's define that interface in `models.ts`.
 
-```typescript
+```ts
 export interface AverageOrderSizeByDayOfWeekStatsModel {
   sunday: number;
   monday: number;
@@ -366,7 +366,7 @@ But, of course, let's start with a test first.
 
 `transforms.test.ts`
 
-```typescript
+```ts
 import { expect } from "chai";
 
 import { AverageOrderSizeByDayOfWeekStatsRecord } from "./models";
@@ -442,7 +442,7 @@ They should fail, complaining that we haven't exported the
 `averageOrderSizeByDayOfWeekRecordsToModel` function yet. Let's go define that function
 in `transforms.ts`.
 
-```typescript
+```ts
 function getAverageOrderAmountForDayOfWeekFromRows(
   dayOfWeek: number,
   rows: any[]
@@ -471,3 +471,42 @@ You'll have to import `AverageOrderSizeByDayOfWeekStatsRecord` and
 
 Run the unit test again: `npm run test:unit`
 They should be passing now.
+
+## Step 6: Put it all together
+
+We could go back to `server.ts` and use our new functions directly there. I recommend
+keeping your top-level application logic separate from protocols like HTTP though.
+To that end, let's create the following:
+
+`order-service.ts`
+
+```ts
+import * as orderRepo from "./order-repository";
+import { averageOrderSizeByDayOfWeekRecordsToModel } from "./transforms";
+
+export async function getAvgOrderAmountByDay() {
+  const records = await orderRepo.getAvgOrderAmountByDay();
+  const model = averageOrderSizeByDayOfWeekRecordsToModel(records);
+  return model;
+}
+```
+
+We left our acceptance tests passing. You can do a quick double check to make sure
+they are still passing: `npm run test:acceptance`
+
+Refactor the `/order-stats` route in `server.ts` to use the functions we just created.
+
+```ts
+app.get("/order-stats", async (req: Request, res: Response) => {
+  const stats = await getAvgOrderAmountByDay();
+  res.send(stats);
+});
+```
+
+You'll have to add this import.
+
+```ts
+import { getAvgOrderAmountByDay } from "./order-service";
+```
+
+Check that our tests are still passing: `npm run test:acceptance`
