@@ -1,11 +1,4 @@
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dmcquay/how-should-i-test-this) 
-
-## Prepare for the exercise
-
-- Clone the repo at git@github.com:dmcquay/how-should-i-test-this.git
-- Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- If you're on Windows, you'll need the Linux Subsystem, Git Bash or some other
-  means of getting access to Bash.
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dmcquay/how-should-i-test-this)
 
 ## Attributes of an effective testing strategy
 
@@ -22,7 +15,7 @@ What would you add to or remove from this list?
 
 ## Types of tests
 
-There are many types of tests. And their defintinos are not always consistent.
+There are many types of tests. And their defintions are not always consistent.
 Here is a reference I think is brief and accurate: [Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
 
 Steve Freeman argues there are really just three types of tests and that's what we'll focus on today.
@@ -33,12 +26,7 @@ Steve Freeman argues there are really just three types of tests and that's what 
 
 I have provded an example e-commerce order management API. It only has a few CRUD endpoints so far. Today we are going to be adding a new endpoint with a focus on how to test it. All tests have been removed from the start folder so that you can work through how to setup all the testing from scratch.
 
-## Step 1: Get the project running
-
-CD into the start directory
-Follow the README
-
-## Step 2: Add test for new endpoint
+## Step 1: Add test for new endpoint
 
 ### Background
 
@@ -64,7 +52,7 @@ Example payload:
 
 Create an empty test. We'll be using the mocha framework. It is already installed.
 
-`src/order-stats.a-test.ts`
+`start/api/src/order-stats.a-test.ts`
 
 ```ts
 it("works", () => {});
@@ -74,7 +62,6 @@ Now we need a way to run our acceptance tests. Add the following to the scripts 
 
 `"test:acceptance": "mocha --require ts-node/register src/**/*.a-test.ts",`
 
-Make sure your project is still running. Run `dev-scripts/start.sh` if it is not.
 And now let's run the tests: `npm run test:acceptance`
 They should be passing.
 
@@ -119,7 +106,7 @@ Opinion: why I suggest verifying little at this layer:
 - Because I’d like to be able to run acceptance tests in a fully integrated environment where it will be much harder to control data
 - Because I can verify exact values and shape with unit tests
 
-## Step 3: Make your test pass in the most simple way possible
+## Step 2: Make your test pass in the most simple way possible
 
 Edit `server.ts` and add this endpoint.
 
@@ -139,7 +126,7 @@ Opinion: Why bother to implement this fake solution?
   prefer not to have many failing tests at once. It is nice to just work on one broken
   test at a time.
 
-## Step 4: Get the data out of the database
+## Step 3: Get the data out of the database
 
 I've already provided `order-repository.ts` so you can follow an established pattern for fetching data from the database. We'll make a new function in
 this file to get the stats we need from the database. But first let's start
@@ -253,6 +240,8 @@ export async function getAvgOrderAmountByDay(): Promise<
 }
 ```
 
+Run your integration tests again: `npm run test:integration`
+
 They should be passing! Yay!
 
 But there are two things that feel weird.
@@ -311,36 +300,29 @@ To accomplish this, let's actually use a completely separate database that has n
 in it! Then, for each test, we will insert data at the beginning of the test and delete it
 at the end of the test.
 
-First, let's create our new database. Add the following to `docker-compose.yaml`.
+I have already set up a test database for you. Let's explore it for a moment.
+Go to your terminal tab labeled "DB".
 
-```yaml
-db-test:
-  image: postgres:10-alpine
-  ports:
-    - "5433:5432"
-  environment:
-    POSTGRES_USER: app
-    POSTGRES_PASSWORD: password
-    POSTGRES_DB: test
-  volumes:
-    - /var/lib/postgresql/data
-    - "./initdb/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql"
+```sql
+select * from "order";
 ```
 
-Note that this looks identical to our other database service definition except that we
-are targeting the schema file only instead of the entire initdb direectory that also
-contains the seed data.
+Here you can see our seed data.
+Now let's switch to our testing database.
 
-We're also exposing this database on port 5433 instead of the standard 5432. Let's configure
-our app to use this database when running integration tests. If you look at `config.ts`,
-you'll see that we can override the postgres port by setting the `POSTGRES_PORT` environment
+```sql
+\c order_management_test;
+select * from "order";
+```
+
+Let's configure
+our app to use the test database when running integration tests. If you look at `config.ts`,
+you'll see that we can override the postgres database by setting the `POSTGRES_DATABASE` environment
 variable.
 
-Edit `api/package.json` once again to override the port.
+Edit `api/package.json` once again to override the database.
 
-`"test:integration": "POSTGRES_PORT=5433 mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts"`
-
-Bring up the new service by running this from the root of the project (the start folder): `docker-compose up -d`
+`"test:integration": "POSTGRES_DATABASE=order_management_test mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts"`
 
 Now run your tests: `npm run test:integration`
 
@@ -369,14 +351,16 @@ after(async () => {
 
 You'll also have to import `pool`.
 
-`import { pool } from "./database-service";`
+```typescript
+import { pool } from "./database-service";
+```
 
 Run your tests again: `npm run test:integration`
 
 They are passing again, only this time you can trust that they will continue to pass
 in the future.
 
-## Step 5: Transform the result
+## Step 4: Transform the result
 
 The data is coming out of the database as a list of
 `AverageOrderSizeByDayOfWeekStatsRecord`s. But remember from the requirements that
@@ -530,7 +514,7 @@ You'll have to import `AverageOrderSizeByDayOfWeekStatsRecord` and
 Run the unit test again: `npm run test:unit`
 They should be passing now.
 
-## Step 6: Put it all together
+## Step 5: Put it all together
 
 We could go back to `server.ts` and use our new functions directly there. I recommend
 keeping your top-level application logic separate from protocols like HTTP though.
@@ -569,7 +553,7 @@ import { getAvgOrderAmountByDay } from "./order-service";
 
 Check that our tests are still passing: `npm run test:acceptance`
 
-## Step 7: Review and debate!
+## Step 6: Review and debate!
 
 - We didn't write any tests for `order-service.ts`. Should we have?
 - We didn't handle any error cases. What important error cases do you think we missed?

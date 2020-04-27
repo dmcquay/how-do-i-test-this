@@ -13,4 +13,6 @@ tasks:
   - name: API (Server)
     before: npm -C start/api i
     command: cd start/api && npm start
+  - name: API (Tests)
+    command: cd start/api
 image: gitpod/workspace-postgres
