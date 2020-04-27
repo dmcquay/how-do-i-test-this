@@ -1,8 +1,8 @@
 tasks:
   - name: DB
     init: >
-      echo "CREATE USER app WITH PASSWORD 'password'"
-      echo "CREATE DATABASE order_management WITH OWNER app" | psql -U app
+      echo "CREATE USER app WITH PASSWORD 'password'" | psql
+      && echo "CREATE DATABASE order_management WITH OWNER app" | psql -U app
       && cat start/initdb/* | psql -U app order_management
       && echo "CREATE DATABASE order_management_test WITH OWNER app" | psql -U app
       && cat start/initdb/01-schema.sql | psql -U app order_management_test
