@@ -1,38 +1,12 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dmcquay/how-should-i-test-this)
 
-## Attributes of an effective testing strategy
-
-- Provide confidence of correctness
-- Encourage pleasant coding experience
-- Provide documentation
-- Easy to write
-- Easy to read/maintain
-- Fast to execute
-- Support refactoring (refactor production code without editing tests)
-- Consistently passes or fails given unchanging code
-
-What would you add to or remove from this list?
-
-## Types of tests
-
-There are many types of tests. And their defintions are not always consistent.
-Here is a reference I think is brief and accurate: [Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
-
-Steve Freeman argues there are really just three types of tests and that's what we'll focus on today.
-
 ![Testing Pyramid: Unit, Integration, Acceptance](docs/testing-pyramid.jpg)
 
 ## Problem Definition
 
-I have provded an example e-commerce order management API. It only has a few CRUD endpoints so far. Today we are going to be adding a new endpoint with a focus on how to test it. All tests have been removed from the start folder so that you can work through how to setup all the testing from scratch.
+Add the following API endpoint:
 
-## Step 1: Add test for new endpoint
-
-### Background
-
-The new endpoint should be located at /order-stats.
-It should return a JSON encoded body that has a key for each day of the week.
-The values should be the average of order amounts, in cents, for all orders placed on that day of the week.
+**GET /order-stats**
 
 Example payload:
 
@@ -47,6 +21,8 @@ Example payload:
   "saturday": 1645
 }
 ```
+
+## Step 1: Add test for new endpoint
 
 ### Create first blank acceptance test
 
@@ -86,8 +62,7 @@ describe("GET /order-stats", () => {
 });
 ```
 
-Our test needs to know where to find our API. This way we can run our acceptance tests against remote environments.
-Add the following to `config.ts`:
+Add to `config.ts`:
 
 ```ts
 test: {
@@ -98,11 +73,7 @@ test: {
 Run acceptance tests again: `npm run test:acceptance`
 It should fail because you're getting a 404 but you expect a 200.
 
-Take note of what we are checking here and what we are not.
-We are checking just enough to tell that the reponse seems to look like order statistics and not some error
-response or something else wildly different. Do you think we should verify the payload more specifically?
-
-Opinion: why I suggest verifying little at this layer:
+**Opinion: why I suggest verifying little at this layer:**
 
 - Because I’d like to be able to run acceptance tests in a fully integrated environment where it will be much harder to control data
 - Because I can verify exact values and shape with unit tests
@@ -123,12 +94,10 @@ app.get("/order-stats", async (req: Request, res: Response) => {
 Run acceptance tests again: `npm run test:acceptance`
 They should now be passing.
 
-Opinion: Why bother to implement this fake solution?
+**Opinion: Why implement this fake implementation?**
 
-- To prove that your tests work. Now all you have to do next is refactor!
-- Next we are going into lower layers of the testing pyramid (integration and unit). I
-  prefer not to have many failing tests at once. It is nice to just work on one broken
-  test at a time.
+- Prove that your tests work
+- One failing test at a time
 
 ## Step 3: Get the data out of the database
 
@@ -138,7 +107,8 @@ with a test!
 
 ### What type of test do we need?
 
-- Let's walk the pyramid from lightest to heaviest.
+Let's walk the pyramid from lightest to heaviest.
+
 - Unit tests
   - We could mock the connection to the database
   - But we could then only verify that we pass the SQL that
@@ -556,3 +526,24 @@ Check that our tests are still passing: `npm run test:acceptance`
   specifying columns?
 - Take a look back at our overall testing values/goals and the testing pyramid. How
   well do you think we achieved those goals? Would you have approached this differently?
+
+## Appendix
+
+### Types of tests
+
+There are many types of tests. And their defintions are not always consistent.
+Here is a reference I think is brief and accurate:
+[Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
+
+### Attributes of an effective testing strategy
+
+- Provide confidence of correctness
+- Encourage pleasant coding experience
+- Provide documentation
+- Easy to write
+- Easy to read/maintain
+- Fast to execute
+- Support refactoring (refactor production code without editing tests)
+- Consistently passes or fails given unchanging code
+
+What would you add to or remove from this list?
