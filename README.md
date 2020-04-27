@@ -5,15 +5,7 @@
 - If you're on Windows, you'll need the Linux Subsystem, Git Bash or some other
   means of getting access to Bash.
 
-## Testing goals
-
-[Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
-
-Today, we're going to focus on these three:
-
-![Testing Pyramid: Unit, Integration, Acceptance](docs/testing-pyramid.jpg)
-
-What attributes do we want from out test?
+## Attributes of an effective testing strategy
 
 - Provide confidence of correctness
 - Encourage pleasant coding experience
@@ -24,7 +16,16 @@ What attributes do we want from out test?
 - Support refactoring (refactor production code without editing tests)
 - Consistently passes or fails given unchanging code
 
-What do you value from tests?
+What would you add to or remove from this list?
+
+## Types of tests
+
+There are many types of tests. And their defintinos are not always consistent.
+Here is a reference I think is brief and accurate: [Types of tests](https://www.atlassian.com/continuous-delivery/software-testing/types-of-software-testing)
+
+Steve Freeman argues there are really just three types of tests and that's what we'll focus on today.
+
+![Testing Pyramid: Unit, Integration, Acceptance](docs/testing-pyramid.jpg)
 
 ## Problem Definition
 
