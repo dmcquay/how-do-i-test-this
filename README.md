@@ -95,7 +95,8 @@ test: {
 },
 ```
 
-Now run your test. It should fail because you're getting a 404 but you expect a 200.
+Run acceptance tests again: `npm run test:acceptance`
+It should fail because you're getting a 404 but you expect a 200.
 
 Take note of what we are checking here and what we are not.
 We are checking just enough to tell that the reponse seems to look like order statistics and not some error
@@ -118,6 +119,9 @@ app.get("/order-stats", async (req: Request, res: Response) => {
   res.send(stats);
 });
 ```
+
+Run acceptance tests again: `npm run test:acceptance`
+They should now be passing.
 
 Opinion: Why bother to implement this fake solution?
 
@@ -240,18 +244,17 @@ export async function getAvgOrderAmountByDay(): Promise<
 }
 ```
 
+You'll need to import `AverageOrderSizeByDayOfWeekStatsRecord` from `models.ts`.
+
 Run your integration tests again: `npm run test:integration`
 
 They should be passing! Yay!
 
 But there are two things that feel weird.
 
-1. My tests "hang" for a while at the end before the process exits. What's
-   going on?
-2. Why did they pass? Where did that data come from and can I trust that
+1. The tests "hang" for a while at the end before the process exits.
+2. Why did they pass? Where did that data come from? Can I trust that
    it will stay that way?
-
-Let's address these one at a time.
 
 ### Fix the "hanging" issue
 
@@ -468,15 +471,6 @@ This is our first unit test. We need to set up a script in `package.json` to run
 tests.
 
 `"test:unit": "mocha --require ts-node/register src/**/*.test.ts"`
-
-Let's also add a line to make it easy to run these in watch mode, which is a little
-more tricky since we're using TypeScript.
-
-`"test:unit:watch": "npm run test:unit -- --watch --watch-files src/**/*.ts"`
-
-And, while we're at it, let's create a shortcut to run all the tests.
-
-`"test": "npm run test:unit && npm run test:integration && npm run test:acceptance"`
 
 Let's run our unit test: `npm run test:unit`
 
