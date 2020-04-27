@@ -1,6 +1,15 @@
 tasks:
-  - init: npm -C mocks i
-    command: npm -C mocks start
-  - init: ./.gitpod-scripts/initialize-postgres.sh && cd start/api && npm i
+  - name: DB
+    init: >
+      echo "CREATE DATABASE order_management" | psql
+      && cat start/initdb/* | psql order_management
+      && echo "CREATE DATABASE order_management_test" | psql
+      && cat start/initdb/01-schema.sql | psql order_management_test
+    command: psql order_management
+  - name: Mocks
+    before: npm -C start/mocks i
+    command: cd start/mocks && npm start
+  - name: API (Server)
+    before: npm -C start/api i
     command: cd start/api && npm start
 image: gitpod/workspace-postgres
