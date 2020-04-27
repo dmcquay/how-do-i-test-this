@@ -109,22 +109,11 @@ with a test!
 
 Let's walk the pyramid from lightest to heaviest.
 
-- Unit tests
-  - We could mock the connection to the database
-  - But we could then only verify that we pass the SQL that
-    we expect to pass. We cannot verify that the SQL is correct.
-- **Integration tests**
-  - Best solution
-  - Allows you to verify the correctness of SQL at the lowest layer possible in
-    the testing pyramid
-- Acceptance tests
-  - Harder to control data for exact verification of results
-  - Mixing with other things being tested at that layer
-  - Farther up the test pyramid
+- Unit tests (insufficient)
+- **Integration tests** (perfect)
+- Acceptance tests (too heavy)
 
-So we need an integration test, but we don't have any in our project yet. We're going to have to do some setup.
-
-### Create first dummy test file
+### Set up integration test suite
 
 Create `order-repository.i-test.ts` with our standard dummy test.
 
@@ -132,16 +121,16 @@ Create `order-repository.i-test.ts` with our standard dummy test.
 it("works", () => {});
 ```
 
-Add the following to package.json so we can run our integration tests.
+Add to `start/api/package.json`:
 
 ```json
 "test:integration": "mocha --require ts-node/register src/**/*.i-test.ts"
 ```
 
-Now run your tests with `npm run test:integration`. You should see our single
-test passing.
+Run `npm run test:integration`.
+Expected result: passing
 
-Opinion: Why have separate entrypoints for different types of tests?
+**Opinion: Why have separate entrypoints for different types of tests?**
 
 - I tend to run tests at the bottom of the pyramid more frequently. For example,
   I often run my unit tests in watch mode all the time that I am coding, but I
@@ -152,11 +141,7 @@ Opinion: Why have separate entrypoints for different types of tests?
   against the environment you just deployed to, which happens much later in your
   build pipeline.
 
-### Enable integration tests to work with the database
-
-Our query is going to return rows that each have a number representing the day of
-week and a number representing the average order amount on that day of the week.
-Let's create an interface to represent this record.
+### Make real test
 
 Add the following to `models.ts`.
 
@@ -166,6 +151,8 @@ export interface AverageOrderSizeByDayOfWeekStatsRecord {
   dayOfWeek: number;
 }
 ```
+
+This is what the raw data coming from the database will look like.
 
 Replace our dummy integration test with a real one.
 
@@ -194,9 +181,7 @@ describe("order-repository", () => {
 });
 ```
 
-And let's just speed along here and add the whole implementation to make this pass.
-
-Add this function to `order-repository.ts`.
+Add to `order-repository.ts`.
 
 ```ts
 export async function getAvgOrderAmountByDay(): Promise<
@@ -216,20 +201,17 @@ export async function getAvgOrderAmountByDay(): Promise<
 
 You'll need to import `AverageOrderSizeByDayOfWeekStatsRecord` from `models.ts`.
 
-Run your integration tests again: `npm run test:integration`
+Run: `npm run test:integration`
+Expected result: passing
 
-They should be passing! Yay!
-
-But there are two things that feel weird.
+Two things feel weird.
 
 1. The tests "hang" for a while at the end before the process exits.
-2. Why did they pass? Where did that data come from? Can I trust that
-   it will stay that way?
+2. Where did that data come from? Can I trust that it?
 
 ### Fix the "hanging" issue
 
-Out tests are hanging at the end because we still have an open connection to the database.
-We need to close that connection immediately upon completion of the test suite.
+We need to close the connection to postgres at the end of the test suite.
 
 Create `integration-test-setup.ts` with this content.
 
@@ -241,21 +223,21 @@ after(() => {
 });
 ```
 
-Now, tell out test suite to load this file prior to any other test files by changing
-our integration test script in `package.json` to the following:
+Configure mocha to load this file prior first.
+
+Edit the integration test script in `package.json` to the following:
 
 `"test:integration": "mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts"`
 
-Run the test suite again and it should exit immediately upon completion of the tests.
-
-`npm run test:integration`
+Run: `npm run test:integration`
+Expected result: passes & exits immediately
 
 ### Control our test data
 
 When we ran our query to get average order amounts, we got some non-zero numbers, indicating
 that there are already orders in the database. How did they get there?
 
-In this case, the data came from `initdb/02-seed-data.sql`. This file provides enough seed
+The data came from `initdb/02-seed-data.sql`. This file provides enough seed
 data for the app to run locally and look normal.
 
 Should we rely on this data in our test suite? Probably not and here's why.
@@ -297,11 +279,11 @@ Edit `api/package.json` once again to override the database.
 
 `"test:integration": "POSTGRES_DATABASE=order_management_test mocha --require ts-node/register --file src/integration-test-setup.ts src/**/*.i-test.ts"`
 
-Now run your tests: `npm run test:integration`
+Run: `npm run test:integration`
+Expected result: fail (no data)
 
-This time they will fail because there is no data in the database.
+Insert the data we need and clean it up when we are done by adding these blocks.
 
-Now let's insert the data we need and clean it up when we are done by adding these blocks.
 In `order-repository.i-test.ts`, put these inside the `describe("#getAvgOrderAmountByDay"` block.
 
 ```ts
@@ -322,16 +304,14 @@ after(async () => {
 });
 ```
 
-You'll also have to import `pool`.
+And import `pool`.
 
 ```typescript
 import { pool } from "./database-service";
 ```
 
-Run your tests again: `npm run test:integration`
-
-They are passing again, only this time you can trust that they will continue to pass
-in the future.
+Run: `npm run test:integration`
+Expected result: passing
 
 ## Step 4: Transform the result
 
@@ -393,30 +373,12 @@ describe("transforms", () => {
     context("when out of order and missing some data", () => {
       it("should map all values correctly and default to 0", () => {});
       const records: AverageOrderSizeByDayOfWeekStatsRecord[] = [
-        {
-          dayOfWeek: 0,
-          averageOrderAmount: 10,
-        },
-        {
-          dayOfWeek: 1,
-          averageOrderAmount: 11,
-        },
-        {
-          dayOfWeek: 3,
-          averageOrderAmount: 13,
-        },
-        {
-          dayOfWeek: 2,
-          averageOrderAmount: 12,
-        },
-        {
-          dayOfWeek: 4,
-          averageOrderAmount: 14,
-        },
-        {
-          dayOfWeek: 6,
-          averageOrderAmount: 16,
-        },
+        { dayOfWeek: 0, averageOrderAmount: 10 },
+        { dayOfWeek: 1, averageOrderAmount: 11 },
+        { dayOfWeek: 3, averageOrderAmount: 13 },
+        { dayOfWeek: 2, averageOrderAmount: 12 },
+        { dayOfWeek: 4, averageOrderAmount: 14 },
+        { dayOfWeek: 6, averageOrderAmount: 16 },
       ];
 
       const expectedModel = {
@@ -442,11 +404,10 @@ tests.
 
 `"test:unit": "mocha --require ts-node/register src/**/*.test.ts"`
 
-Let's run our unit test: `npm run test:unit`
+Run: `npm run test:unit`
+Expected result: fail (function doesn't exist)
 
-They should fail, complaining that we haven't exported the
-`averageOrderSizeByDayOfWeekRecordsToModel` function yet. Let's go define that function
-in `transforms.ts`.
+Add to `transforms.ts`:
 
 ```ts
 function getAverageOrderAmountForDayOfWeekFromRows(
@@ -475,8 +436,8 @@ export function averageOrderSizeByDayOfWeekRecordsToModel(
 You'll have to import `AverageOrderSizeByDayOfWeekStatsRecord` and
 `AverageOrderSizeByDayOfWeekStatsModel` from `models.ts`.
 
-Run the unit test again: `npm run test:unit`
-They should be passing now.
+Run: `npm run test:unit`
+Expected result: passing
 
 ## Step 5: Put it all together
 
@@ -497,8 +458,10 @@ export async function getAvgOrderAmountByDay() {
 }
 ```
 
-We left our acceptance tests passing. You can do a quick double check to make sure
-they are still passing: `npm run test:acceptance`
+We left our acceptance tests passing. Let's double check that they still are.
+
+Run: `npm run test:acceptance`
+Expected result: passing
 
 Refactor the `/order-stats` route in `server.ts` to use the functions we just created.
 
@@ -509,13 +472,14 @@ app.get("/order-stats", async (req: Request, res: Response) => {
 });
 ```
 
-You'll have to add this import.
+Import `getAvgOrderAmountByDay`:
 
 ```ts
 import { getAvgOrderAmountByDay } from "./order-service";
 ```
 
-Check that our tests are still passing: `npm run test:acceptance`
+Run: `npm run test:acceptance`
+Expected result: passing
 
 ## Step 6: Review and debate!
 
