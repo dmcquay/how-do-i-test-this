@@ -8,18 +8,7 @@ services:
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: test
+      POSTGRES_DB: order_management
     volumes:
       - /var/lib/postgresql/data
       - "./initdb:/docker-entrypoint-initdb.d"
-  db-test:
-    image: postgres:10-alpine
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: test
-    volumes:
-      - /var/lib/postgresql/data
-      - "./initdb/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql"

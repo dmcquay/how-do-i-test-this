@@ -1,3 +1,5 @@
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dmcquay/how-should-i-test-this) 
+
 ## Prepare for the exercise
 
 - Clone the repo at git@github.com:dmcquay/how-should-i-test-this.git

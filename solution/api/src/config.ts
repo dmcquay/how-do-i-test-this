@@ -5,9 +5,9 @@ export default {
   postgres: {
     user: "app",
     host: "localhost",
-    database: "test",
+    database: e.POSTGRES_DATABASE || "order_management",
     password: "password",
-    port: parseInt(e.POSTGRES_PORT) || 5432,
+    port: 5432,
   },
   riskService: {
     baseUrl: e.RISK_SERVICE_BASE_URL || "http://localhost:3001/risk",
