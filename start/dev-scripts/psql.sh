@@ -7,5 +7,5 @@ PROJECT_ROOT=`dirname $SCRIPT_ROOT`
 (
     cd $PROJECT_ROOT
 
-    docker-compose exec db psql -U app test
+    docker-compose exec db psql -U app order_management
 )
