@@ -1,5 +1,9 @@
 tasks:
-  - init: echo "Replace me with a build script for the project."
-    command: echo "Replace me with something that should run on every start, or just
-      remove me entirely."
+  - init: echo "CREATE DATABASE order_management" | psql && cat start/initdb/* | psql order_management
+  - init: echo "CREATE DATABASE order_management_test" | psql && cat start/initdb/01-schema.sql | psql order_management_test
+  - init: npm -C mocks i
+    command: npm -C mocks start
+  - init: npm -C api i
+    command: npm -C api start
+  - init: cd api && npm run
 image: gitpod/workspace-postgres
