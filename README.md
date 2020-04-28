@@ -1,5 +1,7 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dmcquay/how-should-i-test-this)
 
+This repository is for a workshop on testing. It is intended to be completed via Gitpod. Click the Gitpod button above to get started.
+
 ![Testing Pyramid: Unit, Integration, Acceptance](docs/testing-pyramid.jpg)
 
 ## Problem Definition
